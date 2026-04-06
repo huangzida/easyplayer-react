@@ -42,7 +42,7 @@ jobs:
         if: github.event.inputs.version
         run: |
           echo "Setting version to ${{ github.event.inputs.version }}"
-          pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
+          sed -i 's/"version": "[^"]*"/"version": "${{ github.event.inputs.version }}"/' package.json
 
       - name: Verify
         run: pnpm verify
