@@ -53,7 +53,7 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
   const getEffectiveConfig = useCallback(() => {
     const p = propsRef.current;
     const modePreset = p.mode === 'live' ? livePreset : p.mode === 'custom' ? {} : vodPreset;
-    const userOverrides = omitBy({ isLive: p.isLive, bufferTime: p.bufferTime }, isUndefined);
+    const userOverrides = omitBy({ isLive: p.isLive, bufferTime: p.bufferTime, controls: p.controls }, isUndefined);
     return { ...modePreset, ...userOverrides };
   }, []);
 
@@ -260,10 +260,13 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
     destroy: () => destroyPlayer(),
   }), [destroyPlayer]);
 
+  const effectiveConfig = getEffectiveConfig();
+  const showControls = effectiveConfig.controls !== false;
+
   return (
     <div
       ref={containerRef}
-      className={`easy-player ${props.className || ''} ${!props.controls ? 'hide-controls' : ''}`}
+      className={`easy-player ${props.className || ''} ${!showControls ? 'hide-controls' : ''}`}
       style={props.style}
       data-url={props.url}
     >
