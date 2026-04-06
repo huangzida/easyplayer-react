@@ -25,6 +25,63 @@ npm install easyplayer-react
 pnpm add easyplayer-react
 ```
 
+## 必须配置：EasyPlayer 资源文件
+
+本包是 EasyPlayerPro 的 React 封装。你需要将 EasyPlayer 运行时资源文件复制到项目的 public 目录。
+
+### 必需文件
+
+安装后，从本包的 `dist/assets/easyplayer/` 目录复制到你的项目 `public/` 目录：
+
+```
+public/
+└── assets/
+    └── easyplayer/
+        ├── EasyPlayer-lib.js
+        ├── EasyPlayer-pro.js
+        ├── EasyPlayer-pro.wasm
+        └── EasyPlayer-decode.js
+```
+
+### 方式一：从 node_modules 复制
+
+安装包后，复制资源文件：
+
+```bash
+# 从 node_modules 复制到你的 public 目录
+cp -r node_modules/easyplayer-react/dist/assets/easyplayer public/assets/
+```
+
+### 方式二：使用 postinstall 脚本
+
+在 `package.json` 中添加：
+
+```json
+{
+  "scripts": {
+    "postinstall": "cp -r node_modules/easyplayer-react/dist/assets/easyplayer public/assets/ || true"
+  }
+}
+```
+
+### CDN 方式
+
+你也可以通过 `assetBaseUrl` 使用 CDN：
+
+```tsx
+import { EasyPlayer } from 'easyplayer-react';
+import 'easyplayer-react/style.css';
+
+function App() {
+  return (
+    <EasyPlayer
+      url="https://example.com/stream.m3u8"
+      assetBaseUrl="https://cdn.example.com/easyplayer"
+    />
+  );
+}
+```
+
 ## 快速开始
 
 ```tsx

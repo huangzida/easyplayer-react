@@ -25,6 +25,63 @@ Or using pnpm:
 pnpm add easyplayer-react
 ```
 
+## Required Setup: EasyPlayer Assets
+
+This package is a React wrapper for EasyPlayerPro. You need to copy the EasyPlayer runtime assets to your project's public directory.
+
+### Required Files
+
+After installation, copy the `assets/easyplayer/` directory from this package to your project's `public/` folder:
+
+```
+public/
+└── assets/
+    └── easyplayer/
+        ├── EasyPlayer-lib.js
+        ├── EasyPlayer-pro.js
+        ├── EasyPlayer-pro.wasm
+        └── EasyPlayer-decode.js
+```
+
+### Option 1: Copy from node_modules
+
+After installing the package, copy the assets:
+
+```bash
+# Copy from node_modules to your public folder
+cp -r node_modules/easyplayer-react/dist/assets/easyplayer your-public-folder/assets/
+```
+
+### Option 2: Using a Post-install Script
+
+Add to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "postinstall": "cp -r node_modules/easyplayer-react/dist/assets/easyplayer public/assets/ || true"
+  }
+}
+```
+
+### CDN Alternative
+
+You can also use a CDN by specifying `assetBaseUrl`:
+
+```tsx
+import { EasyPlayer } from 'easyplayer-react';
+import 'easyplayer-react/style.css';
+
+function App() {
+  return (
+    <EasyPlayer
+      url="https://example.com/stream.m3u8"
+      assetBaseUrl="https://cdn.example.com/easyplayer"
+    />
+  );
+}
+```
+
 ## Quick Start
 
 ```tsx
