@@ -6,7 +6,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
-    ignores: ['playground/public/**'],
+    ignores: ['playground/**', 'public/**'],
   },
   js.configs.recommended,
   {
