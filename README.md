@@ -4,7 +4,6 @@ English | [中文](./README.zh-CN.md)
 
 [![npm version](https://img.shields.io/npm/v/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
 [![npm downloads](https://img.shields.io/npm/dm/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
-[![npm license](https://img.shields.io/npm/l/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
 
 React component wrapper for EasyPlayerPro with typed props, events, and instance methods.
 

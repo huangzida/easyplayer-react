@@ -4,7 +4,6 @@
 
 [![npm version](https://img.shields.io/npm/v/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
 [![npm downloads](https://img.shields.io/npm/dm/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
-[![npm license](https://img.shields.io/npm/l/easyplayer-react.svg)](https://www.npmjs.com/package/easyplayer-react)
 
 基于 EasyPlayerPro 的 React 组件封装，提供类型化的 props、事件和实例方法。
 
