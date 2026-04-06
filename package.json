@@ -67,7 +67,7 @@
     "release": "release-it",
     "pack:check": "pnpm build && pnpm pack --pack-destination .artifacts",
     "publint": "publint",
-    "verify": "pnpm lint && pnpm typecheck && pnpm build && pnpm publint"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
