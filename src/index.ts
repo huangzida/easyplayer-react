@@ -1,5 +1,4 @@
-import EasyPlayer from './components/EasyPlayer/index';
-
+export * from './components/EasyPlayer/index';
 export * from './types';
 export { default as EasyPlayer } from './components/EasyPlayer/index';
 

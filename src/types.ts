@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import type React from 'react';
 
 export type PlayerMode = 'vod' | 'live' | 'custom';
 
@@ -65,11 +66,11 @@ export interface EasyPlayerProps extends EasyPlayerConfig {
   onPlayerReady?: (player: EasyPlayerPro) => void;
   onPlay?: () => void;
   onPause?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
   onTimeout?: () => void;
   onLiveEnd?: () => void;
-  onVideoInfo?: (info: any) => void;
-  onAudioInfo?: (info: any) => void;
+  onVideoInfo?: (info: unknown) => void;
+  onAudioInfo?: (info: unknown) => void;
   onKBps?: (speed: number) => void;
   onTimestamps?: (time: number) => void;
   renderError?: (props: { error: string; retry: () => void }) => React.ReactNode;
@@ -78,7 +79,7 @@ export interface EasyPlayerProps extends EasyPlayerConfig {
 export interface EventHistory {
   timestamp: number;
   event: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface EasyPlayerAssetUrls {
@@ -104,6 +105,7 @@ export interface EasyPlayerProConfig {
   webGPU?: boolean;
   canvasRender?: boolean;
   debug?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -134,12 +136,14 @@ export interface EasyPlayerPro {
   setQuality: (quality: string) => void;
   setRate: (rate: number) => void;
   seekTime: (time: number) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getVideoInfo: () => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAudioInfo: () => any;
   setMic: (enable: boolean) => void;
   destroy: () => Promise<void>;
-  on: (event: string, callback: (e?: any) => void) => void;
-  off?: (event: string, callback?: (e?: any) => void) => void;
+  on: (event: string, callback: (e?: unknown) => void) => void;
+  off?: (event: string, callback?: (e?: unknown) => void) => void;
 }
 
 export interface EasyPlayerRef {

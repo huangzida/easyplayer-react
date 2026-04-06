@@ -3,7 +3,6 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -31,10 +30,15 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
   const isInitializedRef = useRef(false);
   const currentUrlRef = useRef('');
   const retryCountRef = useRef(0);
+  const propsRef = useRef(props);
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    propsRef.current = props;
+  });
 
   const transformToNativeConfig = useCallback((config: Record<string, unknown>) => {
     const nativeConfig: Record<string, unknown> = { ...config };
@@ -47,38 +51,40 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
   }, []);
 
   const getEffectiveConfig = useCallback(() => {
-    const modePreset = props.mode === 'live' ? livePreset : props.mode === 'custom' ? {} : vodPreset;
-    const userOverrides = omitBy({ isLive: props.isLive, bufferTime: props.bufferTime }, isUndefined);
+    const p = propsRef.current;
+    const modePreset = p.mode === 'live' ? livePreset : p.mode === 'custom' ? {} : vodPreset;
+    const userOverrides = omitBy({ isLive: p.isLive, bufferTime: p.bufferTime }, isUndefined);
     return { ...modePreset, ...userOverrides };
-  }, [props.mode, props.isLive, props.bufferTime]);
+  }, []);
 
   const getPlayerConfig = useCallback(() => {
+    const p = propsRef.current;
     const config = omitBy({
       ...getEffectiveConfig(),
-      hasAudio: props.hasAudio,
-      isMute: props.isMute,
-      stretch: props.stretch,
-      poster: props.poster,
-      loadTimeOut: props.loadTimeOut,
-      loadTimeReplay: props.loadTimeReplay,
-      debug: props.debug,
-      mse: props.mse,
-      wcs: props.wcs,
-      wasm: props.wasm,
-      wasmSimd: props.wasmSimd,
-      gpuDecoder: props.gpuDecoder,
-      webGpu: props.webGpu,
-      canvasRender: props.canvasRender,
-      watermark: props.watermark,
-      fullWatermark: props.fullWatermark,
-      quality: props.quality,
+      hasAudio: p.hasAudio,
+      isMute: p.isMute,
+      stretch: p.stretch,
+      poster: p.poster,
+      loadTimeOut: p.loadTimeOut,
+      loadTimeReplay: p.loadTimeReplay,
+      debug: p.debug,
+      mse: p.mse,
+      wcs: p.wcs,
+      wasm: p.wasm,
+      wasmSimd: p.wasmSimd,
+      gpuDecoder: p.gpuDecoder,
+      webGpu: p.webGpu,
+      canvasRender: p.canvasRender,
+      watermark: p.watermark,
+      fullWatermark: p.fullWatermark,
+      quality: p.quality,
     }, isUndefined);
     return transformToNativeConfig(config);
-  }, [props.hasAudio, props.isMute, props.stretch, props.poster, props.loadTimeOut, props.loadTimeReplay, props.debug, props.mse, props.wcs, props.wasm, props.wasmSimd, props.gpuDecoder, props.webGpu, props.canvasRender, props.watermark, props.fullWatermark, props.quality, getEffectiveConfig, transformToNativeConfig]);
+  }, [getEffectiveConfig, transformToNativeConfig]);
 
   const getRetryConfig = useCallback((): RetryConfig => {
-    return props.retry || { maxRetries: 3, retryDelay: 1000, exponentialBackoff: true };
-  }, [props.retry]);
+    return propsRef.current.retry || { maxRetries: 3, retryDelay: 1000, exponentialBackoff: true };
+  }, []);
 
   const recordEvent = useCallback((event: string, data?: unknown) => {
     eventHistoryRef.current = [{ timestamp: Date.now(), event, data }, ...eventHistoryRef.current].slice(0, 100);
@@ -92,7 +98,7 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
   const destroyPlayer = useCallback(async () => {
     clearTimers();
     if (playerRef.current) {
-      try { await playerRef.current.destroy(); } catch {}
+      try { await playerRef.current.destroy(); } catch { /* ignore */ }
       playerRef.current = null;
     }
   }, [clearTimers]);
@@ -104,14 +110,16 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
       container.addEventListener('webglcontextrestored', () => { recordEvent('webglcontextrestored'); });
     }
 
+    const p = propsRef.current;
+
     player.on('play', () => {
       recordEvent('play');
-      props.onPlay?.();
+      p.onPlay?.();
       retryCountRef.current = 0;
       setHasError(false);
     });
 
-    player.on('pause', () => { recordEvent('pause'); props.onPause?.(); });
+    player.on('pause', () => { recordEvent('pause'); p.onPause?.(); });
 
     player.on('error', (error: unknown) => {
       recordEvent('error', error);
@@ -128,7 +136,7 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
       }
 
       setHasError(true);
-      props.onError?.(error);
+      p.onError?.(error);
 
       if (!isNotAllowedError) {
         const config = getRetryConfig();
@@ -138,17 +146,17 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
             : config.retryDelay ?? 1000;
           retryCountRef.current++;
           retryTimerRef.current = window.setTimeout(() => {
-            player.play(props.fallbackUrl && retryCountRef.current > 1 ? props.fallbackUrl : currentUrlRef.current);
+            player.play(p.fallbackUrl && retryCountRef.current > 1 ? p.fallbackUrl : currentUrlRef.current);
           }, delay);
         }
       }
     });
 
-    player.on('timeout', () => { recordEvent('timeout'); props.onTimeout?.(); });
-    player.on('liveEnd', () => { recordEvent('liveEnd'); props.onLiveEnd?.(); });
-    player.on('videoInfo', (info: unknown) => { recordEvent('videoInfo', info); props.onVideoInfo?.(info); });
-    player.on('audioInfo', (info: unknown) => { recordEvent('audioInfo', info); props.onAudioInfo?.(info); });
-    player.on('kBps', (speed: unknown) => { recordEvent('kBps', speed); props.onKBps?.(speed as number); });
+    player.on('timeout', () => { recordEvent('timeout'); p.onTimeout?.(); });
+    player.on('liveEnd', () => { recordEvent('liveEnd'); p.onLiveEnd?.(); });
+    player.on('videoInfo', (info: unknown) => { recordEvent('videoInfo', info); p.onVideoInfo?.(info); });
+    player.on('audioInfo', (info: unknown) => { recordEvent('audioInfo', info); p.onAudioInfo?.(info); });
+    player.on('kBps', (speed: unknown) => { recordEvent('kBps', speed); p.onKBps?.(speed as number); });
 
     playerTimerRef.current = window.setInterval(() => {
       if (playerRef.current) {
@@ -156,22 +164,24 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
           const videoInfo = playerRef.current.getVideoInfo?.();
           if (videoInfo && 'timestamp' in videoInfo && videoInfo.timestamp !== undefined) {
             recordEvent('timestamps', videoInfo.timestamp);
-            props.onTimestamps?.(videoInfo.timestamp);
+            p.onTimestamps?.(videoInfo.timestamp);
           }
-        } catch {}
+        } catch { /* ignore */ }
       }
     }, 1000);
-  }, [recordEvent, props, getRetryConfig]);
+  }, [recordEvent, getRetryConfig]);
 
   const initPlayer = useCallback(async () => {
     const container = containerRef.current;
     if (!container || !currentUrlRef.current || isInitializedRef.current) return;
     isInitializedRef.current = true;
 
+    const p = propsRef.current;
+
     try {
       if (!(window as unknown as Record<string, unknown>).EasyPlayerPro) {
         setIsLoading(true);
-        await ensureEasyPlayerRuntime(props.assetBaseUrl || '');
+        await ensureEasyPlayerRuntime(p.assetBaseUrl || '');
         setIsLoading(false);
       }
 
@@ -183,10 +193,10 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
 
       playerRef.current = player;
       handleEvents(player);
-      props.onPlayerReady?.(player);
+      p.onPlayerReady?.(player);
       recordEvent('playerReady');
 
-      if (props.mode !== 'vod') {
+      if (p.mode !== 'vod') {
         await player.play(currentUrlRef.current);
       }
     } catch (error: unknown) {
@@ -195,10 +205,10 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
       if (!isNotAllowedError) {
         setErrorMessage(String(error));
         setHasError(true);
-        props.onError?.(error);
+        p.onError?.(error);
       }
     }
-  }, [props.assetBaseUrl, props.mode, props.onError, props.onPlayerReady, getPlayerConfig, handleEvents, recordEvent]);
+  }, [getPlayerConfig, handleEvents, recordEvent]);
 
   useEffect(() => {
     if (!props.url) return;
@@ -214,7 +224,7 @@ const EasyPlayer = forwardRef<EasyPlayerRef, EasyPlayerProps>((props, ref) => {
       destroyPlayer();
       isInitializedRef.current = false;
     };
-  }, [props.url]);
+  }, [props.url, initPlayer, clearTimers, destroyPlayer]);
 
   useEffect(() => {
     if (playerRef.current && props.isMute !== undefined) {

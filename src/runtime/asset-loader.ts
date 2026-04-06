@@ -48,12 +48,14 @@ const getBasePath = (): string => {
 export const ensureEasyPlayerRuntime = async (
   assetBaseUrl?: string,
 ): Promise<EasyPlayerAssetUrls> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (loaded && typeof window !== 'undefined' && (window as any).EasyPlayerPro) {
     return defaultAssetUrls;
   }
 
   if (loadingPromise) {
     await loadingPromise;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((window as any).EasyPlayerPro) {
       return defaultAssetUrls;
     }

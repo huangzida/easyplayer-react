@@ -3,10 +3,11 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
 
 export default [
   {
-    ignores: ['playground/**', 'public/**'],
+    ignores: ['playground/**', 'public/**', 'dist/**'],
   },
   js.configs.recommended,
   {
@@ -19,14 +20,12 @@ export default [
         ecmaFeatures: { jsx: true },
       },
       globals: {
+        ...globals.browser,
         console: 'readonly',
-        window: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
-        HTMLDivElement: 'readonly',
-        HTMLElement: 'readonly',
       },
     },
     plugins: {
@@ -45,6 +44,15 @@ export default [
     settings: {
       react: {
         version: 'detect',
+      },
+    },
+  },
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        console: 'readonly',
       },
     },
   },
