@@ -53,8 +53,9 @@
   },
   "scripts": {
     "dev": "vite --config playground/vite.config.ts",
-    "build": "tsdown && vite build --config playground/vite.config.ts && pnpm copy-assets",
+    "build": "tsdown && vite build --config playground/vite.config.ts && pnpm copy-assets && pnpm copy-css",
     "copy-assets": "node -e \"const {existsSync, mkdirSync, copyFileSync, readdirSync, statSync}=require('fs');const src='public/assets';const dest='dist/assets';if(!existsSync(dest))mkdirSync(dest,{recursive:true});readdirSync(src).forEach(f=>{const s=src+'/'+f;const d=dest+'/'+f;if(statSync(s).isDirectory()){if(!existsSync(d))mkdirSync(d,{recursive:true});readdirSync(s).forEach(sf=>copyFileSync(s+'/'+sf,d+'/'+sf));}else{copyFileSync(s,d);}});\"",
+    "copy-css": "node -e \"const {copyFileSync, existsSync, readdirSync}=require('fs');const src='src/style.css';const dest='dist/easyplayer-react.css';if(existsSync(src)){copyFileSync(src,dest);console.log('Copied CSS to dist');}const dts=readdirSync('dist').find(f=>f.startsWith('index-')&&f.endsWith('.d.ts'));if(dts){copyFileSync('dist/'+dts,'dist/index.d.ts');console.log('Copied d.ts');}const dcts=readdirSync('dist').find(f=>f.startsWith('index-')&&f.endsWith('.d.cts'));if(dcts){copyFileSync('dist/'+dcts,'dist/index.d.cts');console.log('Copied d.cts');}\"",
     "build:lib": "tsdown",
     "build:playground": "vite build --config playground/vite.config.ts",
     "lint": "eslint .",

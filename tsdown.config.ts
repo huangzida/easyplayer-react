@@ -13,4 +13,11 @@ export default defineConfig({
   },
   shims: true,
   external: [/\.css$/],
+  outDir: 'dist',
+  outExtension({ format }) {
+    return {
+      js: format === 'esm' ? '.js' : '.cjs',
+      dts: '.d.ts',
+    };
+  },
 });
